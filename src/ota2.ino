@@ -4,10 +4,12 @@
 #include <ArduinoOTA.h>
 
 WiFiClientSecure client;//Cria um cliente seguro (para ter acesso ao HTTPS)
-String textFix = "GET /forms/d/e/1FAIpQLSdm6M_0mTVx_LKHLB1J3u_hjaag_hBtMfDHQlTIKe0EoatfsQ/formResponse?ifq&entry.717212213=";
+//String textFix = "GET /forms/d/e/1FAIpQLSdm6M_0mTVx_LKHLB1J3u_hjaag_hBtMfDHQlTIKe0EoatfsQ/formResponse?ifq&entry.717212213=";
+//2
+String textFix = "GET /forms/d/e/1FAIpQLSe_NPbrA1Hke7zBn2vH45rn8WI2DuS-ZRw2gupkyisq1kURXw/formResponse?ifq&entry.1129360522=";
 //Essa String sera uma auxiliar contendo o link utilizado pelo GET, para nao precisar ficar re-escrevendo toda hora
 //String temp = "26";
-String temp = "27";
+String temp = "temp:56";
 void setup() {
 Serial.begin(115200);//Inicia a comunicacao serial
 Serial.println("Booting");
