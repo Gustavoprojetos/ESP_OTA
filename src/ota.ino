@@ -67,7 +67,7 @@ void setup() {
 void loop() {
   ArduinoOTA.handle();
   digitalWrite(14, HIGH);
-  delay(2000);
+  delay(1000);
   digitalWrite(14, LOW);
   delay(2000);
 
