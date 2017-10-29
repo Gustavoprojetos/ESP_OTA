@@ -15,6 +15,7 @@ Serial.begin(115200);//Inicia a comunicacao serial
 Serial.println("Booting");
 WiFi.mode(WIFI_STA);//Habilita o modo estaçao
 WiFi.begin("Kamuy", "cgla48123456789");//Conecta na rede
+//WiFi.begin("asusk", "12345678");//Conecta na rede
 while (WiFi.waitForConnectResult() != WL_CONNECTED) {
   Serial.println("Connection Failed! Rebooting...");
   delay(5000);
@@ -81,6 +82,6 @@ else
   Serial.println("Erro ao se conectar");//Se nao for possivel conectar no servidor, ira avisar no monitor.
 }
 
-delay(5000);
+delay(2000);
 
 }
