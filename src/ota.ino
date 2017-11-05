@@ -24,6 +24,7 @@ while (WiFi.waitForConnectResult() != WL_CONNECTED) {
   delay(5000);
   ESP.restart();
 }
+/*
 ArduinoOTA.onStart([]() {
   String type;
   if (ArduinoOTA.getCommand() == U_FLASH)
@@ -53,7 +54,7 @@ Serial.println("Ready");
 Serial.print("IP address: ");
 Serial.println(WiFi.localIP());
 Serial.print("Atualizado: ");
-
+*/
 // Iniciar servidor
  server.begin();
 
@@ -85,17 +86,19 @@ void loop() {
     client.flush();
 
 
-    // Liga desliga
+    // Liga desliga-------------------------------------------------------------
     int val;
     int op;
     if (req.indexOf("/gpio/1") != -1){
       val = 1;
+
       op = 1;
       Subir(val, op);
     }
 
     else if (req.indexOf("/gpio/0") != -1 ){
       val = 0;
+
       op = 2;
       Subir(val, op);
     }
