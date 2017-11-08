@@ -1,72 +1,46 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 
 
+
+//------------------------------------------Protótipo da função-----------------------------------------------------------
 int Subir(int val);
+//--------------------------------------------------//--------------------------------------------------------------------
 WiFiClientSecure client;//Cria um cliente seguro (para ter acesso ao HTTPS)
-//String textFix = "GET /forms/d/e/1FAIpQLSdm6M_0mTVx_LKHLB1J3u_hjaag_hBtMfDHQlTIKe0EoatfsQ/formResponse?ifq&entry.717212213=";
-//2
-//String textFix = "GET /forms/d/e/1FAIpQLSe_NPbrA1Hke7zBn2vH45rn8WI2DuS-ZRw2gupkyisq1kURXw/formResponse?ifq&entry.1129360522=";
-//Essa String sera uma auxiliar contendo o link utilizado pelo GET, para nao precisar ficar re-escrevendo toda hora
+
 WiFiServer server(80);
-
-
+String textFix = "GET /v4/spreadsheets/12IYuWdV0aJa8mQPhsR5C6AVEwZufyC05wufTrTJsSg/values/";
+String key = "?key=IzaSyDmot3XwHfsNhqeuKdINMYxpyFK4cY";//Chave de API
+//------------------------------------------Declaração das variáveis dos setores------------------------------------------
+int primeiroandar = 5;
+int garagem = 14;
+int sala = 4;
+int jardim = 2;
+int portao = 12;
+//-------------------------------------------------------------------------------------------------------------------------
 void setup() {
+//-----------------------------------------Pinos como saída-----------------------------------------------------------------
+pinMode(primeiroandar, OUTPUT);
+pinMode(garagem, OUTPUT);
+pinMode(sala, OUTPUT);
+pinMode(jardim, OUTPUT);
+pinMode(portao, OUTPUT);
+//-------------------------------------------------------------------------------------------------------------------------
 Serial.begin(115200);//Inicia a comunicacao serial
 Serial.println("Booting");
 WiFi.mode(WIFI_AP_STA);//Habilita o modo estaçao
 WiFi.begin("Kamuy", "cgla48123456789");//Conecta na rede
-//WiFi.begin("asusk", "12345678");//Conecta na rede
+
 while (WiFi.waitForConnectResult() != WL_CONNECTED) {
   Serial.println("Connection Failed! Rebooting...");
   delay(5000);
   ESP.restart();
 }
-/*
-ArduinoOTA.onStart([]() {
-  String type;
-  if (ArduinoOTA.getCommand() == U_FLASH)
-    type = "sketch";
-  else // U_SPIFFS
-    type = "filesystem";
-
-  // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-  Serial.println("Start updating " + type);
-});
-ArduinoOTA.onEnd([]() {
-  Serial.println("\nEnd");
-});
-ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-  Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-});
-ArduinoOTA.onError([](ota_error_t error) {
-  Serial.printf("Error[%u]: ", error);
-  if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-  else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-  else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-  else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-  else if (error == OTA_END_ERROR) Serial.println("End Failed");
-});
-ArduinoOTA.begin();
-Serial.println("Ready");
-Serial.print("IP address: ");
-Serial.println(WiFi.localIP());
-Serial.print("Atualizado: ");
-*/
-// Iniciar servidor
- server.begin();
-
-pinMode(14, OUTPUT);
+server.begin();
 }
-
-
 void loop() {
-
-  ArduinoOTA.handle();
-
-  //--------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
     // Check if a client has connected
     WiFiClient client = server.available();
     if (!client) {
@@ -86,19 +60,17 @@ void loop() {
     client.flush();
 
 
-    // Liga desliga-------------------------------------------------------------
+    // Liga desliga------------------------------------------------------------------------------------------------------
     int val;
     int op;
     if (req.indexOf("/gpio/1") != -1){
       val = 1;
-
       op = 1;
       Subir(val, op);
     }
 
     else if (req.indexOf("/gpio/0") != -1 ){
       val = 0;
-
       op = 2;
       Subir(val, op);
     }
@@ -108,11 +80,15 @@ void loop() {
       return;
     }
 
-    // Manda request GPIO14
-    digitalWrite(14, val);
+    // Manda request 
+    digitalWrite(sala, val);
+    digitalWrite(garagem, val);
+    digitalWrite(primeiroandar, val);
+    digitalWrite(jardim, val);
+    digitalWrite(portao, val);
 
     client.flush();
-
+//-------------------------------------------------//-----------------------------------------------------------------------
    // Preparando response
     String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>\r\nGPIO is now ";
     s += (val)?"high":"low";
@@ -122,6 +98,33 @@ void loop() {
     client.print(s);
     delay(1);
     Serial.println("Client disonnected");
+
+
+
+    if (client.connect("sheets.googleapis.com", 443) == true)//Tenta se conectar ao servidor do Google APIs na porta 443 (HTTPS)
+      {
+          String toSend = textFix;//Atribuimos a String auxiliar na nova String que sera enviada
+
+          toSend += "C2:C4";//Os valores que queremos ler da planilha. Para uma única célula, use algo como "A2"; para ler varios, use algo como "A1:C4".
+          toSend += key;//Adicionamos a chave na String
+          toSend += " HTTP/1.1";//Completamos o metodo GET para nosso formulario.
+
+          client.println(toSend);//Enviamos o GET ao servidor-
+          client.println("Host: sheets.googleapis.com");//-
+          client.println();//-
+
+
+          Serial.println("Dado recebido:\n");//Mostra no Serial Monitor todo o pacote recebido.-
+          Serial.print(client.readString());//-
+          client.stop();//Encerramos a conexao com o servidor.
+      }
+      else
+      {
+          Serial.println("Erro ao se conectar");
+      }
+
+
+
 
 
 delay(2000);
