@@ -28,17 +28,17 @@ server.begin();//Iniciando servidor.
 }
 void loop() {
   //--------------------------------------------------------------------------------------------------------------------
-  // Check if a client has connected
+  // Verifica se o cliente esta conectado.
   WiFiClient client = server.available();
   if (!client) {
     return;
   }
-  // Wait until the client sends some data
+  // Aguarde até que o cliente envie alguns dados.
   Serial.println("new client");
   while(!client.available()){
     delay(1);
   }
-  // Read the first line of the request
+  // Ler a primeira linha do pedido.
   String req = client.readStringUntil('\r');
   Serial.println(req);
   client.flush();
