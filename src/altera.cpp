@@ -1,4 +1,7 @@
 #include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
 
 //------------------------------------------Protótipo da função-----------------------------------------------------------
 int Subir(int val, int op);
@@ -7,23 +10,30 @@ int Subir(int val, int op);
 WiFiClientSecure client;//Cria um cliente seguro (para ter acesso ao HTTPS)
 WiFiServer server(80);
 //------------------------------------------Declaração das variáveis dos setores------------------------------------------
-int primeiroandar = 5;
-int garagem = 14;
-int sala = 4;
+//int primeiroandar = 5;
+//int garagem = 14;
+//int sala = 4;
 int jardim = 2;
-int portao = 12;
+//int portao = 12;
 
 void setup() {
 //-----------------------------------------Pinos como saída-----------------------------------------------------------------
-pinMode(primeiroandar, OUTPUT);
-pinMode(garagem, OUTPUT);
-pinMode(sala, OUTPUT);
+//pinMode(primeiroandar, OUTPUT);
+//pinMode(garagem, OUTPUT);
+//pinMode(sala, OUTPUT);
 pinMode(jardim, OUTPUT);
-pinMode(portao, OUTPUT);
-//-------------------------------------------------------------------------------------------------------------------------
+//pinMode(portao, OUTPUT);
+digitalWrite(jardim, LOW);
 Serial.begin(115200);//Inicia a comunicacao serial
+WiFiManager wifiManager;
+    //set custom ip for portal
+    //wifiManager.setAPConfig(IPAddress(10,0,1,1), IPAddress(10,0,1,1), IPAddress(255,255,255,0));
+    wifiManager.autoConnect("AutoConnectAP");
+    Serial.println("Conectando:)");
+//-------------------------------------------------------------------------------------------------------------------------
+
 WiFi.mode(WIFI_AP_STA);//Habilita o modo estaçao
-WiFi.begin("Kamuy", "cgla48123456789");//Conecta na rede
+//WiFi.begin("Kamuy", "cgla48123456789");//Conecta na rede
 server.begin();//Iniciando servidor.
 }
 void loop() {
@@ -64,11 +74,11 @@ void loop() {
   }
 
   // Manda request
-  digitalWrite(sala, val);
-  digitalWrite(garagem, val);
-  digitalWrite(primeiroandar, val);
+  //digitalWrite(sala, val);
+  //digitalWrite(garagem, val);
+//  digitalWrite(primeiroandar, val);
   digitalWrite(jardim, val);
-  digitalWrite(portao, val);
+  //digitalWrite(portao, val);
   client.flush();
 //-------------------------------------------------//-----------------------------------------------------------------------
  // Preparando response
