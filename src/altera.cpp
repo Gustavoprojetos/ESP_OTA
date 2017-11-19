@@ -3,6 +3,14 @@
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 
+//-----------------------------------------Deleay2//------------------------------------------
+void delay2(int t) {
+  unsigned long start = millis();
+  do{
+    }while (millis() < start + t); {
+    /* code */
+  }
+}
 //------------------------------------------Protótipo da função-----------------------------------------------------------
 int Subir(int val, int op);
 
