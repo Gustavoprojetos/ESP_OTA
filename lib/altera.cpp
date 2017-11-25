@@ -40,7 +40,7 @@ WiFiManager wifiManager;
     Serial.println("Conectando:)");
 //-------------------------------------------------------------------------------------------------------------------------
 
-WiFi.mode(WIFI_AP_STA);//Habilita o modo estaçao
+//Habilita o modo estaçao
 //WiFi.begin("Kamuy", "cgla48123456789");//Conecta na rede
 server.begin();//Iniciando servidor.
 }

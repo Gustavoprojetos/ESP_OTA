@@ -6,6 +6,11 @@
 //Cria um server na porta 80 (porta
 //padrão para onde os navegadores
 //enviam as requisições http)
+//------------------------------------------Protótipo da função-----------------------------------------------------------
+int Subir(int val, int op);
+
+//--------------------------------------------------//--------------------------------------------------------------------
+WiFiClientSecure client;//Cria um cliente seguro (para ter acesso ao HTTPS)
 WiFiServer server(80);
 
 void setup()
@@ -67,19 +72,14 @@ void loop()
 
  WiFiClient client = server.available();
 
- if (!client)
-
- {
+ if (!client) {
  //Se não houver nenhum cliente podemos retornar pois não há nada a fazer
- return;
-
+  return;
  }
  Serial.println("Novo cliente conectou");
  //Esperamos até que o cliente nos envie a requisição
- while (!client.available())
- {
-
- delay(100);
+ while (!client.available()){
+   delay(100);
  }
  //Fazemos a leitura da requisição
  String req = client.readStringUntil('\r');
@@ -128,6 +128,8 @@ String html =
  "</body>"
  "</html>";
 
+ int val;
+ int op;
  //Escreve o html no buffer que será enviado para o cliente
 client.print(html);
 //Envia os dados do buffer para o cliente
@@ -136,25 +138,37 @@ client.flush();
 if (req.indexOf("acao=gpio0On") != -1)
 {
  //Se possui a ação gpio0On colocamos a saída do GPIO0 como alta
+ val = 1;
+ op = 1;
  digitalWrite(0, HIGH);
+ Subir(val, op);
 }
 //Senão, verifica se a requisição possui a ação gpio0Off
 else if (req.indexOf("acao=gpio0Off") != -1)
 {
  //Se possui a ação gpio0Off colocamos a saída do GPIO0 como baixa
+ val = 0;
+ op = 2;
  digitalWrite(0, LOW);
+ Subir(val, op);
 }
 //Senão, verifica se a requisição possui a ação gpio2On
 else if (req.indexOf("acao=gpio2On") != -1)
 {
  //Se possui a ação gpio2On colocamos a saída do GPIO2 como alta
- digitalWrite(2, HIGH);
+ val = 1;
+ op = 1;
+ digitalWrite(2, val);
+ Subir(val, op);
 }
 //Senão, verifica se a requisição possui a ação gpio2Off
 else if (req.indexOf("acao=gpio2Off") != -1)
 {
  //Se possui a ação gpio0Off colocamos a saída do GPIO2 como baixa
- digitalWrite(2, LOW);
+ val = 0;
+ op = 2;
+ digitalWrite(2, val);
+ Subir(val, op);
 }
 
 //Fecha a conexão com o cliente
@@ -162,3 +176,48 @@ client.stop();
 
 Serial.println("Cliente desconectado");
 }
+
+int Subir(int val, int op){
+  String Ligar = "GET /forms/d/e/1FAIpQLSe_NPbrA1Hke7zBn2vH45rn8WI2DuS-ZRw2gupkyisq1kURXw/formResponse?ifq&entry.1129360522=";
+  String Desligar = "GET /forms/d/e/1FAIpQLSe_NPbrA1Hke7zBn2vH45rn8WI2DuS-ZRw2gupkyisq1kURXw/formResponse?ifq&entry.381708124=";
+
+  switch (op) {
+    case 1:
+      if (client.connect("docs.google.com", 443) == 1)//Tenta se conectar ao servidor do Google docs na porta 443 (HTTPS)
+      {
+        String toSend = Ligar;//Atribuimos a String auxiliar na nova String que sera enviada
+        toSend += val;//Adicionamos um valor
+        toSend += "&submit=Submit HTTP/1.1";//Completamos o metodo GET para nosso formulario.
+
+        client.println(toSend);//Enviamos o GET ao servidor-
+        client.println("Host: docs.google.com");//-
+        client.println();//-
+        client.stop();//Encerramos a conexao com o servidor
+        Serial.println("Dados enviados.");//Mostra no monitor que foi enviado
+      }
+      else
+        {
+          Serial.println("Erro ao se conectar");//Se nao for possivel conectar no servidor, ira avisar no monitor.
+        }
+        break;
+
+    case 2:
+      if (client.connect("docs.google.com", 443) == 1)//Tenta se conectar ao servidor do Google docs na porta 443 (HTTPS)
+      {
+        String toSend = Desligar;//Atribuimos a String auxiliar na nova String que sera enviada
+        toSend += val;//Adicionamos um valor
+        toSend += "&submit=Submit HTTP/1.1";//Completamos o metodo GET para nosso formulario.
+
+        client.println(toSend);//Enviamos o GET ao servidor-
+        client.println("Host: docs.google.com");//-
+        client.println();//-
+        client.stop();//Encerramos a conexao com o servidor
+        Serial.println("Dados enviados.");//Mostra no monitor que foi enviado
+            }
+            else
+              {
+                Serial.println("Erro ao se conectar");//Se nao for possivel conectar no servidor, ira avisar no monitor.
+              }
+              break;
+            }
+      }
